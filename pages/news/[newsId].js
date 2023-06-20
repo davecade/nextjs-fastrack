@@ -11,14 +11,16 @@
 // we just use the useRouter hook below
 // Then we access the newsId by doing router.query
 // So now you can access the query param in the url like this
+// I just added a ternary operator to check the newsID
+// if its 1, then it will render the details, otherwise it will render not found
 
 import { useRouter } from "next/router";
 
 const DetailsPage = () => {
     const router = useRouter();
-    const newsId = router.query.newsId
+    const newsId = router.query.newsId;
 
-    return <div>The Details Page</div>;
+    return newsId === "1" ? <div>The Details Page</div> : <div>Not Found!</div>;
 };
 
 export default DetailsPage;
