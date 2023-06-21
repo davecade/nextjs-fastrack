@@ -47,11 +47,62 @@ const HomePage = ({ meetups }) => {
 
 export const getStaticProps = async () => {
 	// can fetch data from an API
+	// You ALWAYS need to return an object, even an empty one
+
+	//** Pros / Cons  */
+	// Use this most of the time, especially if you dont expect any data to change all the time
+	// The server will pre-generate an HTML file, and it can be stored and served by a CDN
+	// this will make it faster than pre-generating and fetching the data for every incoming request
+
+	//** Revalidate
+	// This allows incremental static generation
+	// Below we have 10 for 10 seconds. This means that every 10 seconds
+	// it will regenerate the page for an incoming request
+	// so basically this means this page will not just be generated during build process
+	// but it will also be generated every few seconds on the server at least if
+	// there are requests for this page. So here it would be regenerated every 10 seconds
+	// so if your data changes after deployment, it will be regenerated on the server
+	// you dont need to redeploy and rebuild again
 	return {
 		props: {
 			meetups: DUMMY_MEETUPS,
 		},
-	}; // You ALWAYS need to return an object, even an empty one
+		revalidate: 10, // number of seconds nextjs will wait until it regenerates the page for an incoming request
+	};
 };
+
+// export const getServerSideProps = async (context) => {
+// 	// can fetch data from an API
+
+// 	//** context */
+// 	// You can use context for this context also in getStaticProps
+// 	// but our example we will use it here
+//     // You can access req and res here
+//     // you dont have access to req and res in getStaticProps
+// 	const req = context.req;
+// 	const res = context.res;
+
+// 	//** getServerSideProps */
+// 	// This does not run during the build process, but instead always on the server
+// 	// after deployment
+// 	// We still return props like getStatusProps, but cannot use revalidate
+// 	// The reason is because this will get run for every request anyway, so theres no point
+
+//     //** Pros / Cons  */
+//     // This might sound better because ts guaranteed to run for every request
+//     // However this can be disadvantage because it'll mean that you'll have to
+//     // wait for your page to be generated every incoming request.
+//     // You will have to wait for the fetch call to finish whenever you have data.
+//     // You should use this when your data changes all the time, meaning multiple
+//     // time per second, and even revalidate wont help
+//     // If data does not change multiple times, then getStaticProps is better
+//     // Especially if you dont need access to req and res objects
+
+// 	return {
+// 		props: {
+//             meetups: DUMMY_MEETUPS
+//         },
+// 	};
+// };
 
 export default HomePage;
