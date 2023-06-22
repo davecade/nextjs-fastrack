@@ -60,16 +60,20 @@ export const getStaticPaths = async () => {
 	client.close();
 
 	return {
-		// The fallback is true or false
+		// The fallback is true or false or blocking
 		// It tells nextjs if the paths array has ALL the possible dynamic ids
 		// if it does, then you need to set it to false
 		// if it doesnt have all possible values, then you need to set to true
 		// If it is set to true, nextjs will try to dynamically generate the
 		// page using the id passed in if it doesnt find it in the array
 		// So you can decide if you only want to add some or all in the array
-		// its good if you want to pass in the ones that are more common
-		// and leave the rest out
-		fallback: false,
+		// its good if you want to pas
+		// blocking is similar to true:
+		// With true, if it doesnt find the ID, it would immediately return an empty page
+		// then pull down the dynamically generated content once its done.
+		// with blocking, the user will not see any page until page was regenerated
+		// and the finished page will be served
+		fallback: "blocking",
 		paths: meetups.map((meetup) => ({
 			params: { meetupId: meetup._id.toString() },
 		})),
