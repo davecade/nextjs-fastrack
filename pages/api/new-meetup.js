@@ -17,21 +17,18 @@ const handler = async (req, res) => {
 	if (req.method === "POST") {
 		const data = req.body;
 
-		// const { title, image, address, description } = data.body;
+		const myMongoString = process.env.MY_DB;
 
-        const myMongoString = process.env.MY_DB;
+		const client = await MongoClient.connect(myMongoString);
 
-		const client = MongoClient.connect(myMongoString);
-
-		const db = client.db;
-
+		const db = client.db();
 		const meetupsCollection = db.collection("meetups");
 
 		const result = await meetupsCollection.insertOne(data);
 
 		console.log(result);
 
-		(await client).close();
+		client.close();
 
 		res.status(201).json({ message: "meetup inserted" });
 	}
