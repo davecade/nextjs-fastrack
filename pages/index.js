@@ -1,5 +1,6 @@
 import MeetupList from "../components/meetups/MeetupList";
 import React from "react";
+import { MongoClient } from "mongodb";
 
 const DUMMY_MEETUPS = [
 	{
@@ -63,9 +64,30 @@ export const getStaticProps = async () => {
 	// there are requests for this page. So here it would be regenerated every 10 seconds
 	// so if your data changes after deployment, it will be regenerated on the server
 	// you dont need to redeploy and rebuild again
+
+	//** API */
+	// This code will only be on our server or during build time. Never client.
+	// So instead of fetching our own api again while in the backend, we can just
+	// directly call the database from here
+	const myMongoString = process.env.MY_DB;
+
+	const client = await MongoClient.connect(myMongoString);
+
+	const db = client.db();
+	const meetupsCollection = db.collection("meetups");
+
+	const meetups = await meetupsCollection.find().toArray();
+
+	client.close();
+
 	return {
 		props: {
-			meetups: DUMMY_MEETUPS,
+			meetups: meetups.map((meetup) => ({
+				title: meetup.title,
+				address: meetup.address,
+				image: meetup.image,
+				id: meetup._id.toString(), // We need to turn the ObjectID into a String ID
+			})),
 		},
 		revalidate: 10, // number of seconds nextjs will wait until it regenerates the page for an incoming request
 	};
